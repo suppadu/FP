@@ -17,7 +17,6 @@ protocol BuilderProtocol {
 class Builder: BuilderProtocol {
     
     static var container: NSPersistentContainer!
-    static let collectionView = CollectionView()
     
     func getContainer(persistentContainer: NSPersistentContainer){
         Builder.container = persistentContainer
@@ -27,13 +26,16 @@ class Builder: BuilderProtocol {
         let networkService = NetworkService()
         let storageService = StorageServiceCoreData()
         let view = MainViewController()
+        let collectionView = CollectionView()
         let presenter = MainPresenter(view: view,
-                                            networkService: networkService,
-                                            storageService: storageService)
+                                      networkService: networkService,
+                                      storageService: storageService,
+                                      collectionView: collectionView)
         let collectionPresenter = CollectionPresenter(mainView: view,
                                                       mainPresenter: presenter)
         view.presenter = presenter
-        self.collectionView.collectionPresenter = collectionPresenter
+        view.collectionView = collectionView
+        collectionView.collectionPresenter = collectionPresenter
         storageService.persistentContainer = self.container
         return view
     }

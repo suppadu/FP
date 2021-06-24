@@ -9,14 +9,14 @@ import Foundation
 import UIKit
 
 protocol MainViewProtocol {
-    func setImageCover(data: Data)
     func pushNavBar(view: UIViewController)
 }
 
 protocol MainPresenterProtocol: AnyObject {
     init(view: MainViewController,
          networkService: NetworkService,
-         storageService: StorageServiceCoreData)
+         storageService: StorageServiceCoreData,
+         collectionView: CollectionView)
     
     func getAnimePosters(amount: Int)
     func pushNavBar(view: UIViewController)
@@ -27,15 +27,18 @@ class MainPresenter: MainPresenterProtocol {
     let view: MainViewController
     let networkService: NetworkService
     let storageService: StorageServiceCoreData
+    let collectionView: CollectionView
     var animePosters = [Data]()
     var animes = [Anime]()
     
     required init(view: MainViewController,
                   networkService: NetworkService,
-                  storageService: StorageServiceCoreData) {
+                  storageService: StorageServiceCoreData,
+                  collectionView: CollectionView) {
         self.view = view
         self.networkService = networkService
         self.storageService = storageService
+        self.collectionView = collectionView
     }
     
     func getAnimePosters(amount: Int) {
@@ -47,14 +50,11 @@ class MainPresenter: MainPresenterProtocol {
                 self.networkService.getAnime { anime in
                     self.animes.append(anime)
                     let stringUrl = anime.data?.attributes.posterImage?.original ?? "https://miro.medium.com/max/1956/1*pUEZd8z__1p-7ICIO1NZFA.png"
-//                    let id = anime.data?.id ?? "0"
                     let url = URL(string: stringUrl)!
                     if let imageData = try? Data(contentsOf: url){
                         self.animePosters.append(imageData)
                         imageGroup.leave()
                     }
-//                    self.view.setImageCover(data: imageData)
-//                    self.storageService.saveShowedAnime(id: Int(id) ?? 0)
                 }
                 }
         imageGroup.notify(queue: DispatchQueue.main){
